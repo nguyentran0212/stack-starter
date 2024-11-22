@@ -50,7 +50,7 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
         "ansible-playbook",
         "playbook.yml",
         "-i", infra_path,
-        "-v",
+        "-vvv",
         "--ask-become-pass"
     ]
     
