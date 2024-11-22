@@ -24,3 +24,12 @@
     ```bash
     pip install stack-starter
     ```
+
+## Available recipes
+
+### Provision
+
+### Configure
+
+- `mac_arm_starter`: macOS rice with `ZSH`, `nvim`, `kitty` terminal emulator, tiling manager `yabai`, hotkey daemon `skhd`, `sketchybar` and `borders`. Tested on macOS 14. 
+

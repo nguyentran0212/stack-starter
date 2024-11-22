@@ -1,3 +1,0 @@
-- name: Run bash script with sudo
-  script: path/to/your/script.sh
-  become: yes
