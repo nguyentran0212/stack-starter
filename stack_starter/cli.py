@@ -46,8 +46,6 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
  
     os.chdir(recipe_dir) 
     
-    sudo_password = input("Enter your sudo password: ")
-
     ansible_command = [
         "ansible-playbook",
         "playbook.yml",
