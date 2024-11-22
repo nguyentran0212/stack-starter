@@ -1,0 +1,6 @@
+---
+- name: Run setup_mac.sh script
+  hosts: all
+  tasks:
+    - name: Execute setup_mac.sh
+      script: setup_mac.sh
