@@ -1,0 +1,44 @@
+# Vagrantfile for development cluster VM for NVAL
+
+## Get paths to ssh keys from env
+ENV_PATH = ".env"
+SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
+
+Vagrant.configure("2") do |config|
+  # Use custom base box instead of ubuntu/focal64
+  config.vm.box = "nval-base-box"
+
+  ## Main machine that runs NVAL
+  config.vm.define "controller" do |controller|
+    controller.vm.box = "nval-base-box"  # Keep this different if needed
+    controller.vm.hostname = "controller.local"
+    controller.vm.network "private_network", ip: "192.168.56.12", hostname: true
+    controller.vm.network :forwarded_port, guest: 8000, host: 8000
+    controller.vm.network :forwarded_port, guest: 8081, host: 8081
+    controller.vm.network :forwarded_port, guest: 3333, host: 3333
+    controller.vm.network :forwarded_port, guest: 3100, host: 3100
+    controller.vm.network :forwarded_port, guest: 9090, host: 9090
+    controller.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus = 4
+    end
+  end
+
+  ## Worker machines that NVAL uses to deploy blockchain
+  (1..4).each do |i|
+    config.vm.define "nval_#{i}" do |nval|
+      # Use our custom base box instead
+      nval.vm.box = "nval-base-box"
+      nval.vm.hostname = "nval#{i}.local"
+      nval.vm.network "private_network", ip: "192.168.56.#{12 + i}", hostname: true
+      nval.vm.provider "virtualbox" do |vb|
+        vb.memory = "2048"
+        vb.cpus = 1
+      end
+    end
+  end
+
+  # Reduced provisioning - only machine-specific steps
+  config.vm.provision "file", source: SSH_KEY_PATH, destination: "~/.ssh/"
+  config.vm.provision "shell", path: "set_authorised_keys.sh"
+end
