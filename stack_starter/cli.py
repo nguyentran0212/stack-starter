@@ -27,12 +27,20 @@ def parse_sys_args():
     return parser.parse_args()
 
 def provision(infra : str, provider : str, recipe : str):
-    recipe_dir = os.path.join(args.recipe_path, recipe)
+    pass
+
+def configure(infra : str, recipe : str, working_dir: str, recipe_path: str): 
+    recipe_dir = os.path.join(recipe_path, recipe)
+    infra_path = os.path.join(working_dir, infra)
+
     
     if not os.path.isdir(recipe_dir):
         raise FileNotFoundError(f"Recipe directory '{recipe_dir}' does not exist.")
-    
-    os.chdir(recipe_dir)
+
+    if not os.path.exists(infra_path):
+        raise FileNotFoundError(f"Infrastructure at '{infra_path}' does not exist.")
+ 
+    os.chdir(recipe_dir) 
     
     ansible_command = [
         "ansible-playbook",
@@ -41,11 +49,6 @@ def provision(infra : str, provider : str, recipe : str):
     ]
     
     subprocess.run(ansible_command, check=True)
-
-def configure(infra : str, recipe : str): 
-    print(f"Infrastructure: {infra}")
-    print(f"Recipe: {recipe}")
-    pass
 
 def main():
     args = parse_sys_args()
