@@ -50,8 +50,8 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
         "ansible-playbook",
         "playbook.yml",
         "-i", infra_path,
-        "-vvv",
-        "--ask-become-pass"
+        "-vv",
+        # "--ask-become-pass"
     ]
     
     subprocess.run(ansible_command, check=True)

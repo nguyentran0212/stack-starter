@@ -1,11 +1,6 @@
 ---
 - name: Run setup_mac.sh script
   hosts: all
-  become: yes
   tasks:
     - name: Execute setup_mac.sh
       shell: ./setup_mac.sh
-      register: script_output
-    - name: Display script output
-      debug:
-        var: script_output.stdout

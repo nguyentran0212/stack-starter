@@ -136,6 +136,7 @@ brew services start borders
 csrutil status
 echo "(optional) Disable SIP for advanced yabai features."
 # TODO: check if the line exist in sudoer and skip if it exists
+echo "Enable yabai to run sudo without password"
 echo "$(whoami) ALL=(root) NOPASSWD: sha256:$(shasum -a 256 $(which yabai) | cut -d " " -f 1) $(which yabai) --load-sa" | sudo tee /private/etc/sudoers.d/yabai
 echo "Installation complete...\n"
 
