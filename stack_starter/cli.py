@@ -56,15 +56,16 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
 
 def main():
     args = parse_sys_args()
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    
+    script_dir = os.path.dirname(os.path.abspath(__file__))    
     working_dir = os.path.abspath(args.directory) if os.path.isabs(args.directory) else os.path.join(script_dir, args.directory)
     recipe_dir = os.path.abspath(args.recipe_path) if os.path.isabs(args.recipe_path) else os.path.join(script_dir, args.recipe_path)
+    configure_recipe_dir = os.path.join(recipe_dir, "configure")
+    provision_recipe_dir = os.path.join(recipe_dir, "provision")
 
     if args.cmd == "provision":
         provision(args.infra, args.provider, args.recipe)
     elif args.cmd == "configure":
-        configure(args.infra, args.recipe, working_dir, recipe_dir) 
+        configure(args.infra, args.recipe, working_dir, configure_recipe_dir) 
 
     
 
