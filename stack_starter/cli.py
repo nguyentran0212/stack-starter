@@ -34,6 +34,7 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
     infra_path = os.path.join(working_dir, infra)
 
     if infra == "localhost":
+        os.makedirs(os.path.dirname(infra_path), exist_ok=True)
         with open(infra_path, 'w') as inventory_file:
             inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
     
