@@ -33,6 +33,10 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
     recipe_dir = os.path.join(recipe_path, recipe)
     infra_path = os.path.join(working_dir, infra)
 
+    if infra == "localhost":
+        with open(infra_path, 'w') as inventory_file:
+            inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
+
     
     if not os.path.isdir(recipe_dir):
         raise FileNotFoundError(f"Recipe directory '{recipe_dir}' does not exist.")
