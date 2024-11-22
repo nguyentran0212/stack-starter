@@ -3,18 +3,20 @@ import argparse
 def parse_sys_args():
     # Setup top level parser
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
-    parser.add_argument("infra", help="Name of the infrastructure to provision or configure", default="localhost")
-    parser.add_argument("-d", "--directory", help="Specify the working directory", default="/tmp/stack_starter/")
+    parser.add_argument("-d", "--directory", help="Working directory for storing provisioning output", default="/tmp/stack_starter/")
+    parser.add_argument("-r", "--recipe-path", help="Path to directory where recipies are stored", default="./../recipes")
     subparsers = parser.add_subparsers(title="CMD", description="Sub-commands")
 
     # Setup sub-parser for provision sub-command
     parser_provision = subparsers.add_parser("provision", description="Provision machines and networks from bare metal or cloud providers", epilog="Return an Ansible hostfile of the provisioned machines")
-    parser_provision.add_argument("provider", help="Infrastructure provider for the machines to provision", default="localhost")
+    parser_provision.add_argument("infra", help="Name of the infrastructure to provision or configure")
+    parser_provision.add_argument("provider", help="Infrastructure provider for the machines to provision")
     parser_provision.add_argument("recipe", help="Recipe for provisioning")
     parser_provision.set_defaults(cmd="provision")
 
     # Setup sub-parser for configure sub-command
     parser_configure = subparsers.add_parser("configure", description="Configure software stack on a specified infrastructure")
+    parser_configure.add_argument("infra", help="Name of the infrastructure to configure. Use localhost to configure the current machine.", default="localhost")
     parser_configure.add_argument("recipe", help="Recipe for configure the infrastructure")
     parser_configure.set_defaults(cmd="configure")
     
@@ -22,12 +24,14 @@ def parse_sys_args():
     # Example: Namespace(infra='home', directory='/tmp/stack_starter/', recipe='mac_os_host', cmd='configure')
     return parser.parse_args()
 
-def provision(provider : str, recipe : str):
+def provision(infra : str, provider : str, recipe : str):
+    print(f"Infrastructure: {infra}")
     print(f"Provider: {provider}")
     print(f"Recipe: {recipe}")
     pass
 
-def configure(recipe : str): 
+def configure(infra : str, recipe : str): 
+    print(f"Infrastructure: {infra}")
     print(f"Recipe: {recipe}")
     pass
 
@@ -35,9 +39,9 @@ def main():
     args = parse_sys_args()
 
     if args.cmd == "provision":
-        provision(args.provider, args.recipe)
+        provision(args.infra, args.provider, args.recipe)
     elif args.cmd == "configure":
-        configure(args.recipe) 
+        configure(args.infra, args.recipe) 
 
     
 
