@@ -49,7 +49,8 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
     ansible_command = [
         "ansible-playbook",
         "playbook.yml",
-        "-i", infra_path
+        "-i", infra_path,
+        "-v"
     ]
     
     subprocess.run(ansible_command, check=True)
