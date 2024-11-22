@@ -7,7 +7,7 @@ def parse_sys_args():
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
     parser.add_argument("-d", "--directory", help="Working directory for storing provisioning output", default="/tmp/stack_starter/")
     parser.add_argument("-r", "--recipe-path", help="Path to directory where recipies are stored", default="./../recipes")
-    subparsers = parser.add_subparsers(title="CMD", description="Sub-commands")
+    subparsers = parser.add_subparsers(title="CMD", description="Sub-commands", required=True)
 
     # Setup sub-parser for provision sub-command
     parser_provision = subparsers.add_parser("provision", description="Provision machines and networks from bare metal or cloud providers", epilog="Return an Ansible hostfile of the provisioned machines")
@@ -36,7 +36,6 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
     if infra == "localhost":
         with open(infra_path, 'w') as inventory_file:
             inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
-
     
     if not os.path.isdir(recipe_dir):
         raise FileNotFoundError(f"Recipe directory '{recipe_dir}' does not exist.")
@@ -49,18 +48,20 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
     ansible_command = [
         "ansible-playbook",
         "playbook.yml",
-        "-i", infra
+        "-i", infra_path
     ]
     
     subprocess.run(ansible_command, check=True)
 
 def main():
     args = parse_sys_args()
+    working_dir = args.directory
+    recipe_dir = args.recipe_path
 
     if args.cmd == "provision":
         provision(args.infra, args.provider, args.recipe)
     elif args.cmd == "configure":
-        configure(args.infra, args.recipe) 
+        configure(args.infra, args.recipe, working_dir, recipe_dir) 
 
     
 
