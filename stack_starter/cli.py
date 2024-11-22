@@ -46,11 +46,14 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
  
     os.chdir(recipe_dir) 
     
+    sudo_password = input("Enter your sudo password: ")
+
     ansible_command = [
         "ansible-playbook",
         "playbook.yml",
         "-i", infra_path,
-        "-v"
+        "-v",
+        "--ask-become-pass"
     ]
     
     subprocess.run(ansible_command, check=True)
