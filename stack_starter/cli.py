@@ -30,18 +30,7 @@ def parse_sys_args():
     return parser.parse_args()
 
 def provision(infra : str, provider : str, recipe : str):
-    valid_dirs = []
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    for default_dir in default_dirs:
-        combined_dir = os.path.join(dir, default_dir)
-        if os.path.isdir(combined_dir):
-            if os.path.isabs(combined_dir):
-                valid_dirs.append(combined_dir)
-            else:
-                valid_dirs.append(os.path.abspath(os.path.join(script_dir, combined_dir)))
-
-    return valid_dirs
+    pass
 
 def configure(infra : str, recipe : str, working_dir: str, recipe_path: str): 
     recipe_dir = os.path.join(recipe_path, recipe)
@@ -100,7 +89,18 @@ def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
     return provision_recipes, configure_recipes
 
 def prepare_dir_list(dir : str, default_dirs : List[str]) -> List[str]:
-    pass
+    valid_dirs = []
+    combined_dirs = [dir].extend(default_dirs)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    for dir in combined_dirs:
+        if os.path.isdir(dir):
+            if os.path.isabs(dir):
+                valid_dirs.append(dir)
+            else:
+                valid_dirs.append(os.path.abspath(os.path.join(script_dir, dir)))
+
+    return valid_dirs
 
 
 def main():
