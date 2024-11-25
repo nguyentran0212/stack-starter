@@ -4,6 +4,7 @@ import subprocess
 import yaml
 from typing import List, Tuple
 from typing_extensions import Dict
+from runners import ansible_runner
 
 default_recipe_dirs = [
     "./..recipes",
@@ -34,42 +35,13 @@ def parse_sys_args():
     # Example: Namespace(infra='home', directory='/tmp/stack_starter/', recipe='mac_os_host', cmd='configure')
     return parser.parse_args()
 
-def provision(infra : str, provider : str, recipe : str):
-    pass
-
-def configure(infra : str, recipe : str, working_dir: str, recipe_path: str): 
-    recipe_dir = os.path.join(recipe_path, recipe)
-    infra_path = os.path.join(working_dir, infra)
-
-    if infra == "localhost":
-        os.makedirs(os.path.dirname(infra_path), exist_ok=True)
-        with open(infra_path, 'w') as inventory_file:
-            inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
-    
-    if not os.path.isdir(recipe_dir):
-        raise FileNotFoundError(f"Recipe directory '{recipe_dir}' does not exist.")
-
-    if not os.path.exists(infra_path):
-        raise FileNotFoundError(f"Infrastructure at '{infra_path}' does not exist.")
- 
-    os.chdir(recipe_dir) 
-    
-    ansible_command = [
-        "ansible-playbook",
-        "playbook.yml",
-        "-i", infra_path,
-        "-vv",
-        # "--ask-become-pass"
-    ]
-    
-    subprocess.run(ansible_command, check=True)
 
 def prepare_working_dir(working_dir : str): 
     # Create directory structure
     # Create empty localhost file if it does not exist
     pass
 
-def load_recipes(recipe_dirs : List[str]) -> Tuple[Dict[str, str], Dict[str, str]]:
+def load_recipes(recipe_dirs : List[str]) -> Tuple[Dict[str, Dict], Dict[str, Dict]]:
     provision_recipes = {}
     configure_recipes = {}
 
@@ -83,7 +55,7 @@ def load_recipes(recipe_dirs : List[str]) -> Tuple[Dict[str, str], Dict[str, str
                             manifest = yaml.safe_load(f)
                             recipe_name = manifest.get('name')
                             recipe_type = manifest.get('recipe_type')
-                            print(f"detected {file}")
+                            manifest["recipe_dir"] = os.path.dirname(manifest_path) # Add directory containing the recipe directory
                             
                             if recipe_type == 'provision':
                                 provision_recipes[recipe_name] = manifest
@@ -94,6 +66,7 @@ def load_recipes(recipe_dirs : List[str]) -> Tuple[Dict[str, str], Dict[str, str
 
     for recipe_dir in recipe_dirs:
         process_recipe_dir(recipe_dir)
+
     return provision_recipes, configure_recipes
 
 def prepare_dir_list(dir : str, default_dirs : List[str] = []) -> List[str]:
@@ -110,6 +83,39 @@ def prepare_dir_list(dir : str, default_dirs : List[str] = []) -> List[str]:
 
     return valid_dirs
 
+def get_infra_path(infra_name : str, working_dir : str) -> str:
+    infra_path = os.path.join(working_dir, infra_name)
+
+    if infra_name == "localhost":
+        os.makedirs(os.path.dirname(infra_path), exist_ok=True)
+        with open(infra_path, 'w') as inventory_file:
+            inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
+
+    if not os.path.exists(infra_path): 
+        raise NotADirectoryError(f"Cannot find an inventory file at {infra_path}. Please provision the infrastructure first.")
+
+    return infra_path
+
+
+
+def provision(infra : str, provider : str, recipe : str):
+    pass
+
+def configure(infra_path : str, recipe_metadata : Dict[str, str]): 
+    recipe_dir = recipe_metadata.get("recipe_dir")
+    if not recipe_dir: 
+        raise ValueError(f"Should not happen. recipe_dir does not exist in manifest: {recipe_metadata}")
+
+    recipe_runtime = recipe_metadata.get("recipe_runtime")
+    recipe_entry = recipe_metadata.get("recipe_entry", "bash")
+    if recipe_runtime == "ansible":
+        ansible_runner(infra_path, recipe_entry, recipe_dir)
+    elif recipe_runtime == "bash":
+        raise NotImplementedError("Bash runner is not implemented")
+    else:
+        raise ValueError(f"Unknown recipe runtime: {recipe_runtime}")
+
+ 
 
 def main():
     # Parse system args
@@ -117,10 +123,7 @@ def main():
     # Setup paths, prepare working directory, and load recipes
     script_dir = os.path.dirname(os.path.abspath(__file__))    
     working_dir = os.path.abspath(args.directory) if os.path.isabs(args.directory) else os.path.join(script_dir, args.directory)
-    recipe_dir = os.path.abspath(args.recipe_path) if os.path.isabs(args.recipe_path) else os.path.join(script_dir, args.recipe_path)
     recipe_dirs = prepare_dir_list(args.recipe_path, default_recipe_dirs)
-    configure_recipe_dir = os.path.join(recipe_dir, "configure")
-    provision_recipe_dir = os.path.join(recipe_dir, "provision")
 
     # Prepare working directory
     prepare_working_dir(working_dir)
@@ -129,12 +132,16 @@ def main():
 
     if args.cmd == "provision":
         # Throw if the required provision_recipe is not available
+        if args.recipe not in provision_recipes:
+            raise ValueError(f"Provision recipe '{args.recipe}' does not exist.")
         provision(args.infra, args.provider, args.recipe)
     elif args.cmd == "configure":
         # Throw if the required configure recipe is not available
         if args.recipe not in configure_recipes:
             raise ValueError(f"Configure recipe '{args.recipe}' does not exist.")
-        configure(args.infra, args.recipe, working_dir, configure_recipe_dir) 
+        recipe_metadata = configure_recipes[args.recipe]
+        infra_path = get_infra_path(args.infra, working_dir)
+        configure(infra_path, recipe_metadata) 
 
     
 
