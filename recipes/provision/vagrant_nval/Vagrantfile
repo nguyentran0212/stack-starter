@@ -25,10 +25,6 @@ Vagrant.configure("2") do |config|
       vb.memory = "4096"
       vb.cpus = 4
     end
-    # Write IP to Ansible inventory
-    controller.vm.provision "shell", inline: <<-SHELL
-      echo "controller ansible_host=192.168.56.12" > ./ansible_inventory
-    SHELL
   end
 
   ## Worker machines that NVAL uses to deploy blockchain
@@ -41,10 +37,6 @@ Vagrant.configure("2") do |config|
         vb.memory = "2048"
         vb.cpus = 1
       end
-      # Write IP to Ansible inventory
-      nval.vm.provision "shell", inline: <<-SHELL
-        echo "nval_#{i} ansible_host=192.168.56.#{12 + i}" >> ./ansible_inventory
-      SHELL
     end
   end
 
