@@ -4,6 +4,15 @@
 ENV_PATH = ".env"
 SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
 
+# Dictionary to store hostnames and their IP addresses
+host_ip_map = {
+  "controller.local" => "192.168.56.12"
+}
+
+(1..4).each do |i|
+  host_ip_map["nval#{i}.local"] = "192.168.56.#{12 + i}"
+end
+
 Vagrant.configure("2") do |config|
   # Configuration here will create default VMs
   # config.vm.box = "ubuntu/focal64"
