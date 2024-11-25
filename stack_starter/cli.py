@@ -107,7 +107,9 @@ def main():
         # Throw if the required provision_recipe is not available
         provision(args.infra, args.provider, args.recipe)
     elif args.cmd == "configure":
-        # Throw if the required configure recipe is not available 
+        # Throw if the required configure recipe is not available
+        if args.recipe not in configure_recipes:
+            raise ValueError(f"Configure recipe '{args.recipe}' does not exist.")
         configure(args.infra, args.recipe, working_dir, configure_recipe_dir) 
 
     
