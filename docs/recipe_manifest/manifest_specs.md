@@ -14,5 +14,6 @@ Metadata:
 - `version : str`: a string showing the version of the recipe. Semantic Versioning is expected.
 - `homepage : str` (optional): a URL of the recipe homepage (e.g., GitHub repository)
 - `repository_url : str` (optional): a URL to the git repository of the recipe
+- `recipe_type : str`: type of recipe. Allowed values: `provision`, `configure`
 - `recipe_runtime : str`: name of the tool required for running the recipe. Allowed values: `bash`, `ansible`, `vagrant`
 - `recipe_entry : str`: name of the entry point for running the recipe (e.g., bash script, ansible playbook, vagrant file)

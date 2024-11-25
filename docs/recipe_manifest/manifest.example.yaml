@@ -3,5 +3,6 @@ name : "example_recipe"
 version : "0.1.1"
 homepage : "https://home-page.org"
 repository_url : "git://github.com/my/repo"
+recipe_type : "provision" # Possible types are provision and configuration
 recipe_runtime : "bash" # Specify that bash is required to run this recipe
 recipe_entry : "start.sh" # stack-starter would run bash start.sh 
