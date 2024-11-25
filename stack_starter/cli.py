@@ -90,7 +90,7 @@ def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
 
 def prepare_dir_list(dir : str, default_dirs : List[str]) -> List[str]:
     valid_dirs = []
-    combined_dirs = [dir].extend(default_dirs)
+    combined_dirs = [dir] + default_dirs
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     for dir in combined_dirs:
