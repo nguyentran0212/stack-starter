@@ -15,7 +15,10 @@ Think of `stack-starter` as a USB stick for setting up a new OS, but instead of 
 
 ## Installation
 
+We use `pipx` to make the `stack-starter` utility available in terminal without modifying the python packages at the system level.
+
 ### macOS
+
 
 1. Install `pipx` if you haven't already:
 
@@ -33,12 +36,31 @@ Think of `stack-starter` as a USB stick for setting up a new OS, but instead of 
 3. Install `stack-starter`:
 
     ```bash
-    pip install stack-starter
+    pipx install stack-starter
     ```
+
+### GNU/Linux based systems
+
+TBA
+
+
+## Usage
+
+```bash
+# Use a recipe to provision an infrastructure and store the info in an Ansible hostfile named infra_name
+stack-starter provision infra_name recipe_name
+
+# Use a recipe to configure localhost
+stack-starter configure localhost recipe_name
+
+# Use a recipe to configure infrastructure in an ansible hostfile called infra_name
+stack-starter configure infra_name recipe_name
+```
+
 
 ## Available recipes
 
-Recipes are stored in `recipes/configure` and `recipes/provision`
+Built-in recipes are stored in `stack_starter/recipes/configure` and `stack_starter/recipes/provision`
 
 ### Provision
 
@@ -50,7 +72,10 @@ Provision recipes handle the creation
 
 - `mac_arm_starter`: macOS rice with `ZSH`, `nvim`, `kitty` terminal emulator, tiling manager `yabai`, hotkey daemon `skhd`, `sketchybar` and `borders`. Tested on macOS 14. 
 
-## Develop
+
+## Contribute
+
+### Setup a development environment
 
 This project use `poetry` to manage dependencies and build package. Install `poetry` if you haven't. 
 
@@ -62,15 +87,7 @@ stack-starter -h  # Should be accessible and working
 
 ### Recipe development instruction
 
-Recipes are stored in the `recipes` folder by default. User can change this directory with `-r DIRECTORY` argument when using the CLI. 
+Built-in recipes are stored in the `stack-starter/recipes` folder by default. User can tell stack-starter to look for recipes at more folders by adding `-r DIRECTORY` argument when using the CLI. 
 
-Each recipe is identified by their folder name.
+Each recipe is a folder which contains a `manifest.json` file. Information inside manifest is used to identify and run recipe.[Manifest instruction](docs/recipe_manifest/manifest_specs.md). 
 
-Each recipe contains a `manifest.json` file.
-
-Manifest instruction: TBA
-
-### Wishlist features
-
-- [ ] Add vagrant support
-- [ ] Ensure bash does not run on anything besides localhost
