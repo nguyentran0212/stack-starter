@@ -3,7 +3,17 @@ import yaml
 from typing import List, Tuple
 from typing_extensions import Dict
 
-def prepare_dir_list(dir : str, default_dirs : List[str] = []) -> List[str]:
+def prepare_dir_list(dir: str, default_dirs: List[str] = []) -> List[str]:
+    """
+    Prepare a list of valid directory paths.
+
+    Args:
+        dir (str): The directory path to validate and include.
+        default_dirs (List[str], optional): A list of default directory paths to include. Defaults to [].
+
+    Returns:
+        List[str]: A list of absolute paths to valid directories.
+    """
     valid_dirs = []
     combined_dirs = [dir] + default_dirs
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,6 +28,15 @@ def prepare_dir_list(dir : str, default_dirs : List[str] = []) -> List[str]:
 
 
 def load_recipes(recipe_dirs: List[str]) -> Tuple[Dict[str, Dict], Dict[str, Dict]]:
+    """
+    Load recipes from specified directories.
+
+    Args:
+        recipe_dirs (List[str]): A list of directories to search for recipe manifests.
+
+    Returns:
+        Tuple[Dict[str, Dict], Dict[str, Dict]]: Two dictionaries containing provision and configure recipes.
+    """
     provision_recipes = {}
     configure_recipes = {}
 
@@ -45,13 +64,32 @@ def load_recipes(recipe_dirs: List[str]) -> Tuple[Dict[str, Dict], Dict[str, Dic
 
     return provision_recipes, configure_recipes
 
-def prepare_working_dir(working_dir : str): 
+def prepare_working_dir(working_dir: str):
+    """
+    Prepare the working directory by creating necessary subdirectories and files.
+
+    Args:
+        working_dir (str): The path to the working directory.
+    """
     # Create directory structure
     # Create empty localhost file if it does not exist
     pass
 
 
-def get_infra_path(infra_name : str, working_dir : str) -> str:
+def get_infra_path(infra_name: str, working_dir: str) -> str:
+    """
+    Get the path to the infrastructure inventory file.
+
+    Args:
+        infra_name (str): The name of the infrastructure.
+        working_dir (str): The path to the working directory.
+
+    Returns:
+        str: The path to the infrastructure inventory file.
+
+    Raises:
+        NotADirectoryError: If the inventory file does not exist.
+    """
     infra_path = os.path.join(working_dir, infra_name)
 
     if infra_name == "localhost":
