@@ -7,6 +7,8 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pyyaml = "^6.0.2"
+typing-extensions = "^4.12.2"
 
 [tool.poetry.scripts]
 stack-starter = "stack_starter.cli:main"
