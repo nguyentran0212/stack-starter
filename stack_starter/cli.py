@@ -2,7 +2,7 @@ import argparse
 import os
 import subprocess
 import yaml
-from typing import Tuple
+from typing import List, Tuple
 from typing_extensions import Dict
 
 def parse_sys_args():
@@ -87,6 +87,10 @@ def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
                 except yaml.YAMLError as e:
                     print(f"Error loading YAML file {manifest_path}: {e}")
     return provision_recipes, configure_recipes
+
+def prepare_dir_list(dir : str, default_dirs : List[str]) -> List[str]:
+    pass
+
 
 def main():
     # Parse system args
