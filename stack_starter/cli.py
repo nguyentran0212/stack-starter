@@ -72,15 +72,18 @@ def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
         for file in files:
             if file == "manifest.yaml":
                 manifest_path = os.path.join(root, file)
-                with open(manifest_path, 'r') as f:
-                    manifest = yaml.safe_load(f)
-                    recipe_name = manifest.get('name')
-                    recipe_type = manifest.get('type')
-                    
-                    if recipe_type == 'provision':
-                        provision_recipes[recipe_name] = manifest
-                    elif recipe_type == 'configure':
-                        configure_recipes[recipe_name] = manifest
+                try:
+                    with open(manifest_path, 'r') as f:
+                        manifest = yaml.safe_load(f)
+                        recipe_name = manifest.get('name')
+                        recipe_type = manifest.get('type')
+                        
+                        if recipe_type == 'provision':
+                            provision_recipes[recipe_name] = manifest
+                        elif recipe_type == 'configure':
+                            configure_recipes[recipe_name] = manifest
+                except yaml.YAMLError as e:
+                    print(f"Error loading YAML file {manifest_path}: {e}")
 
     return provision_recipes, configure_recipes
 
