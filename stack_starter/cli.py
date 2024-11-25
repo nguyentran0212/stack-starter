@@ -5,6 +5,11 @@ import yaml
 from typing import List, Tuple
 from typing_extensions import Dict
 
+default_recipe_dirs = [
+    "./..recipes",
+    "/tmp/stack_starter/recipes"
+]
+
 def parse_sys_args():
     # Setup top level parser
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
@@ -64,7 +69,7 @@ def prepare_working_dir(working_dir : str):
     # Create empty localhost file if it does not exist
     pass
 
-def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
+def load_recipes(recipe_dirs : List[str]) -> Tuple[Dict[str, str], Dict[str, str]]:
     provision_recipes = {}
     configure_recipes = {}
 
@@ -88,7 +93,7 @@ def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
                     print(f"Error loading YAML file {manifest_path}: {e}")
     return provision_recipes, configure_recipes
 
-def prepare_dir_list(dir : str, default_dirs : List[str]) -> List[str]:
+def prepare_dir_list(dir : str, default_dirs : List[str] = []) -> List[str]:
     valid_dirs = []
     combined_dirs = [dir] + default_dirs
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -110,13 +115,14 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))    
     working_dir = os.path.abspath(args.directory) if os.path.isabs(args.directory) else os.path.join(script_dir, args.directory)
     recipe_dir = os.path.abspath(args.recipe_path) if os.path.isabs(args.recipe_path) else os.path.join(script_dir, args.recipe_path)
+    recipe_dirs = prepare_dir_list(args.recipe_path, default_recipe_dirs)
     configure_recipe_dir = os.path.join(recipe_dir, "configure")
     provision_recipe_dir = os.path.join(recipe_dir, "provision")
 
     # Prepare working directory
     prepare_working_dir(working_dir)
     # Detect and load all the recipes
-    provision_recipes, configure_recipes = load_recipes(recipe_dir)
+    provision_recipes, configure_recipes = load_recipes(recipe_dirs)
 
     if args.cmd == "provision":
         # Throw if the required provision_recipe is not available
