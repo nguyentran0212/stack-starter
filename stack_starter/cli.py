@@ -59,11 +59,14 @@ def configure(infra : str, recipe : str, working_dir: str, recipe_path: str):
     subprocess.run(ansible_command, check=True)
 
 def prepare_working_dir(working_dir : str): 
+    # Create directory structure
+    # Create empty localhost file if it does not exist
     pass
 
 def load_recipes(recipe_dir : str) -> Tuple[Dict[str, str], Dict[str, str]]:
     provision_recipes = {}
     configure_recipes = {}
+
     return provision_recipes, configure_recipes
 
 def main():
