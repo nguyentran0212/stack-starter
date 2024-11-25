@@ -1,0 +1,6 @@
+---
+name : "vagrant_nval"
+version : "0.1.1"
+recipe_type : "provision"
+recipe_runtime : "vagrant" # Specify that bash is required to run this recipe
+recipe_entry : "Vagrantfile" # stack-starter would run bash start.sh 

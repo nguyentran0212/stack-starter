@@ -5,7 +5,7 @@ from .runners import ansible_runner, bash_runner
 from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path
 
 default_recipe_dirs = [
-    "./..recipes",
+    "./recipes",
     "/tmp/stack_starter/recipes"
 ]
 

@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
       "hostname" => "controller.local"
       "hostaddr" => "192.168.56.12"
     }
-  end
+  end # End controller provision
 
   ## Worker machines that NVAL uses to deploy blockchain
   (1..4).each do |i|
@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
         "hostaddr" => "192.168.56.#{12 + i}"
       }
     end
-  end
+  end # End worker provision
 
   # These provisioning would run on all VMs
   config.vm.provision :shell, path: "bootstrap.sh"
@@ -62,15 +62,16 @@ Vagrant.configure("2") do |config|
     swapon /swapfile
     echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
   SHELL
-# Write the host_info hash to an Ansible hosts file
-File.open("ansible_hosts", "w") do |file|
-  file.puts "[controller]"
-  file.puts host_info["controller.local"]["hostaddr"]
 
-  file.puts "\n[nval]"
-  (1..4).each do |i|
-    file.puts host_info["nval#{i}.local"]["hostaddr"]
-  end
-end
+  # Write the host_info hash to an Ansible hosts file
+  File.open("ansible_hosts", "w") do |file|
+    file.puts "[controller]"
+    file.puts host_info["controller.local"]["hostaddr"]
 
-end
+    file.puts "\n[nval]"
+    (1..4).each do |i|
+      file.puts host_info["nval#{i}.local"]["hostaddr"]
+    end
+  end # End File operation
+
+end # End vagrant configuration
