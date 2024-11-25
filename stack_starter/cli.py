@@ -1,7 +1,7 @@
 import argparse
 import os
 from typing_extensions import Dict
-from .runners import ansible_runner
+from .runners import ansible_runner, bash_runner
 from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path
 
 default_recipe_dirs = [
@@ -46,8 +46,8 @@ def configure(infra_path : str, recipe_metadata : Dict[str, str]):
     recipe_entry = recipe_metadata.get("recipe_entry", "bash")
     if recipe_runtime == "ansible":
         ansible_runner(infra_path, recipe_entry, recipe_dir)
-    elif recipe_runtime == "bash":
-        raise NotImplementedError("Bash runner is not implemented")
+    elif recipe_runtime == "bash": 
+        bash_runner(infra_path, recipe_entry, recipe_dir)
     else:
         raise ValueError(f"Unknown recipe runtime: {recipe_runtime}")
 
