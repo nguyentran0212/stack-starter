@@ -4,14 +4,8 @@
 ENV_PATH = ".env"
 SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
 
-# Dictionary to store hostnames and their IP addresses
-host_ip_map = {
-  "controller.local" => "192.168.56.12"
-}
-
-(1..4).each do |i|
-  host_ip_map["nval#{i}.local"] = "192.168.56.#{12 + i}"
-end
+# Dictionary to store info of hosts.
+host_info = {}
 
 Vagrant.configure("2") do |config|
   # Configuration here will create default VMs
@@ -34,6 +28,10 @@ Vagrant.configure("2") do |config|
       vb.memory = "4096"
       vb.cpus = 4
     end
+    host_info["controller.local"] = {
+      "hostname" => "controller.local"
+      "hostaddr" => "192.168.56.12"
+    }
   end
 
   ## Worker machines that NVAL uses to deploy blockchain
@@ -46,6 +44,10 @@ Vagrant.configure("2") do |config|
         vb.memory = "2048"
         vb.cpus = 1
       end
+      host_info["nval#{i}.local"] = {
+        "hostname" => "nval#{i}.local"
+        "hostaddr" => "192.168.56.#{12 + i}"
+      }
     end
   end
 
