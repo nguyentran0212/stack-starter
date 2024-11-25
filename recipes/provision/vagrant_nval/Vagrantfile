@@ -62,4 +62,15 @@ Vagrant.configure("2") do |config|
     swapon /swapfile
     echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
   SHELL
+# Write the host_info hash to an Ansible hosts file
+File.open("ansible_hosts", "w") do |file|
+  file.puts "[controller]"
+  file.puts host_info["controller.local"]["hostaddr"]
+
+  file.puts "\n[nval]"
+  (1..4).each do |i|
+    file.puts host_info["nval#{i}.local"]["hostaddr"]
+  end
+end
+
 end
