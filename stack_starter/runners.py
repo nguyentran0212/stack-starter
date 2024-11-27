@@ -23,3 +23,6 @@ def bash_runner(infra_path : str, script : str, recipe_dir : str):
         script
     ]
     subprocess.run(bash_command, check=True)
+
+def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, recipe_dir : str):
+    pass
