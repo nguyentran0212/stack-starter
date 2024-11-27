@@ -43,6 +43,9 @@ def parse_sys_args():
     parser_configure.add_argument("recipe", help="Recipe for configure the infrastructure")
     parser_configure.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_configure.set_defaults(cmd="configure")
+
+    # Setup sub-parser for recipe management sub-command
+    parser_recipe = subparsers.add_parser("recipe", description="Manage recipes")
     
     # Parse and return arguments in Name space object
     # Example: Namespace(infra='home', directory='/tmp/stack_starter/', recipe='mac_os_host', cmd='configure')
