@@ -9,6 +9,19 @@ default_recipe_dirs = [
     "/tmp/stack_starter/recipes"
 ]
 
+# argparser custom action for parsing key-value arguments
+class keyvalue(argparse.Action): 
+    # Constructor calling 
+    def __call__( self , parser, namespace, 
+                 values : list[str], option_string = None): 
+        setattr(namespace, self.dest, dict()) 
+          
+        for value in values: 
+            # split it into key and value 
+            key, value = value.split('=') 
+            # assign into dictionary 
+            getattr(namespace, self.dest)[key] = value 
+
 def parse_sys_args():
     # Setup top level parser
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
@@ -21,12 +34,14 @@ def parse_sys_args():
     parser_provision.add_argument("infra", help="Name of the infrastructure to provision or configure")
     parser_provision.add_argument("provider", help="Infrastructure provider for the machines to provision")
     parser_provision.add_argument("recipe", help="Recipe for provisioning")
+    parser_provision.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_provision.set_defaults(cmd="provision")
 
     # Setup sub-parser for configure sub-command
     parser_configure = subparsers.add_parser("configure", description="Configure software stack on a specified infrastructure")
     parser_configure.add_argument("infra", help="Name of the infrastructure to configure. Use localhost to configure the current machine.", default="localhost")
     parser_configure.add_argument("recipe", help="Recipe for configure the infrastructure")
+    parser_configure.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_configure.set_defaults(cmd="configure")
     
     # Parse and return arguments in Name space object
@@ -34,7 +49,7 @@ def parse_sys_args():
     return parser.parse_args()
 
 
-def provision(infra_name : str, infra_provider : str, recipe_metadata : Dict[str, str], working_dir : str):
+def provision(infra_name : str, infra_provider : str, recipe_metadata : Dict[str, str], working_dir : str, kwargs : Dict[str, str]):
     recipe_dir = recipe_metadata.get("recipe_dir")
     if not recipe_dir: 
         raise ValueError(f"Should not happen. recipe_dir does not exist in manifest: {recipe_metadata}")
@@ -42,9 +57,9 @@ def provision(infra_name : str, infra_provider : str, recipe_metadata : Dict[str
     recipe_runtime = recipe_metadata.get("recipe_runtime")
     recipe_entry = recipe_metadata.get("recipe_entry", "bash")
     if recipe_runtime == "vagrant":
-        vagrant_runner(infra_name, infra_provider, recipe_entry, recipe_dir, working_dir)
+        vagrant_runner(infra_name, infra_provider, recipe_entry, recipe_dir, working_dir, kwargs)
 
-def configure(infra_path : str, recipe_metadata : Dict[str, str]): 
+def configure(infra_path : str, recipe_metadata : Dict[str, str], kwargs : Dict[str, str]): 
     recipe_dir = recipe_metadata.get("recipe_dir")
     if not recipe_dir: 
         raise ValueError(f"Should not happen. recipe_dir does not exist in manifest: {recipe_metadata}")
@@ -52,9 +67,9 @@ def configure(infra_path : str, recipe_metadata : Dict[str, str]):
     recipe_runtime = recipe_metadata.get("recipe_runtime")
     recipe_entry = recipe_metadata.get("recipe_entry", "bash")
     if recipe_runtime == "ansible":
-        ansible_runner(infra_path, recipe_entry, recipe_dir)
+        ansible_runner(infra_path, recipe_entry, recipe_dir, kwargs)
     elif recipe_runtime == "bash": 
-        bash_runner(infra_path, recipe_entry, recipe_dir)
+        bash_runner(infra_path, recipe_entry, recipe_dir, kwargs)
     else:
         raise ValueError(f"Unknown recipe runtime: {recipe_runtime}")
 
@@ -79,14 +94,14 @@ def main():
         if args.recipe not in provision_recipes:
             raise ValueError(f"Provision recipe '{args.recipe}' does not exist.")
         recipe_metadata = provision_recipes[args.recipe]
-        provision(args.infra, args.provider, recipe_metadata, working_dir)
+        provision(args.infra, args.provider, recipe_metadata, working_dir, args.kwargs)
     elif args.cmd == "configure":
         # Throw if the required configure recipe is not available
         if args.recipe not in configure_recipes:
             raise ValueError(f"Configure recipe '{args.recipe}' does not exist.")
         recipe_metadata = configure_recipes[args.recipe]
         infra_path = get_infra_path(args.infra, working_dir)
-        configure(infra_path, recipe_metadata) 
+        configure(infra_path, recipe_metadata, args.kwargs) 
 
     
 

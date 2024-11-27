@@ -2,7 +2,7 @@ import os
 import subprocess
 from .utils import set_provision_env_variables
 
-def ansible_runner(infra_path : str, playbook : str, recipe_dir : str):
+def ansible_runner(infra_path : str, playbook : str, recipe_dir : str, kwargs : dict[str, str]):
     os.chdir(str(recipe_dir)) 
     ansible_command = [
         "ansible-playbook",
@@ -13,7 +13,7 @@ def ansible_runner(infra_path : str, playbook : str, recipe_dir : str):
     ]
     subprocess.run(ansible_command, check=True)
 
-def bash_runner(infra_path : str, script : str, recipe_dir : str):
+def bash_runner(infra_path : str, script : str, recipe_dir : str, kwargs : dict[str, str]):
     _, tail = os.path.split(infra_path)
     if tail != "localhost":
         raise ValueError(f"Bash runner only works with localhost. Provided infrastructure: {infra_path}")
@@ -25,7 +25,7 @@ def bash_runner(infra_path : str, script : str, recipe_dir : str):
     ]
     subprocess.run(bash_command, check=True)
 
-def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, recipe_dir : str, working_dir : str):
+def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, recipe_dir : str, working_dir : str, kwargs : dict[str, str]):
     def validate_infra_provider(infra_provider : str):
         known_providers = ["virtualbox", "vmware_desktop", "vmware_fusion", "docker", "hyperv"]
         if infra_provider not in known_providers:
