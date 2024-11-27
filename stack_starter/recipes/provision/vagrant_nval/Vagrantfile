@@ -64,13 +64,13 @@ Vagrant.configure("2") do |config|
   SHELL
 
   # Write the host_info hash to an Ansible hosts file
-  File.open("ansible_hosts", "w") do |file|
+  File.open("hosts.ini", "w") do |file|
     file.puts "[controller]"
-    file.puts host_info["controller.local"]["hostaddr"]
+    file.puts "controller ansible_host=#{host_info["controller.local"]["hostaddr"]} ansible_user=vagrant"
 
-    file.puts "\n[nval]"
+    file.puts "\n[worker]"
     (1..4).each do |i|
-      file.puts host_info["nval#{i}.local"]["hostaddr"]
+      file.puts "worker_#{i} ansible_host=#{host_info["nval#{i}.local"]["hostaddr"]} ansible_user=vagrant"
     end
   end # End File operation
 
