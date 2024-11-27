@@ -1,8 +1,10 @@
 # Vagrantfile for development cluster VM for NVAL
 
 ## Get paths to ssh keys from env
-ENV_PATH = ENV['ENV_PATH'] || ".env"
-SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
+# ENV_PATH = ENV['ENV_PATH'] || ".env"
+# SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
+SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || "~/.ssh/id_rsa.pub"
+WORKING_DIR = ENV['STACK_STARTER_WORKING_DIR'] || "/tmp/stack_starter/"
 
 # Dictionary to store info of hosts.
 host_info = {}
