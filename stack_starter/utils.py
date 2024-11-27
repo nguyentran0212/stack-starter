@@ -101,3 +101,9 @@ def get_infra_path(infra_name: str, working_dir: str) -> str:
         raise NotADirectoryError(f"Cannot find an inventory file at {infra_path}. Please provision the infrastructure first.")
 
     return infra_path
+
+def set_provision_env_variables(infra_name : str, infra_provider : str, working_dir : str):
+    os.environ['STACK_STARTER_INFRA_NAME'] = infra_name
+    os.environ['STACK_STARTER_INFRA_PROVIDER'] = infra_provider
+    os.environ["STACK_STARTER_WORKING_DIR"] = working_dir
+
