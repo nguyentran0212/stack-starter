@@ -27,3 +27,16 @@ def bash_runner(infra_path : str, script : str, recipe_dir : str):
 def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, recipe_dir : str):
     os.environ['STACK_STARTER_INFRA_NAME'] = infra_name
     os.environ['STACK_STARTER_INFRA_PROVIDER'] = infra_provider
+
+    os.chdir(str(recipe_dir))
+    vagrant_command = [
+        "vagrant",
+        "up",
+        "--provider",
+        infra_provider,
+        "--vagrantfile",
+        recipe_entry
+    ]
+    result = subprocess.run(vagrant_command, check=False)
+    if result.returncode != 0:
+        raise RuntimeError("Vagrant command failed with exit code {}".format(result.returncode))
