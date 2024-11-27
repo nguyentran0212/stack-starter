@@ -1,5 +1,6 @@
 import os
 import subprocess
+from .utils import set_provision_env_variables
 
 def ansible_runner(infra_path : str, playbook : str, recipe_dir : str):
     os.chdir(str(recipe_dir)) 
@@ -24,9 +25,18 @@ def bash_runner(infra_path : str, script : str, recipe_dir : str):
     ]
     subprocess.run(bash_command, check=True)
 
-def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, recipe_dir : str):
-    os.environ['STACK_STARTER_INFRA_NAME'] = infra_name
-    os.environ['STACK_STARTER_INFRA_PROVIDER'] = infra_provider
+def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, recipe_dir : str, working_dir : str):
+    def validate_infra_provider(infra_provider : str):
+        known_providers = ["virtualbox", "vmware_desktop", "vmware_fusion", "docker", "hyperv"]
+        if infra_provider not in known_providers:
+            return "virtualbox"
+        else:
+            return infra_provider
+
+    infra_provider = validate_infra_provider(infra_provider)
+    set_provision_env_variables(infra_name, infra_provider, working_dir) 
+
+    os.environ["VAGRANT_VAGRANTFILE"] = recipe_entry
 
     os.chdir(str(recipe_dir))
     vagrant_command = [
@@ -34,9 +44,8 @@ def vagrant_runner(infra_name: str, infra_provider : str, recipe_entry : str, re
         "up",
         "--provider",
         infra_provider,
-        "--vagrantfile",
-        recipe_entry
     ]
+    print(vagrant_command)
     result = subprocess.run(vagrant_command, check=False)
     if result.returncode != 0:
         raise RuntimeError("Vagrant command failed with exit code {}".format(result.returncode))

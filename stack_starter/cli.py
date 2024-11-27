@@ -1,7 +1,7 @@
 import argparse
 import os
 from typing_extensions import Dict
-from .runners import ansible_runner, bash_runner
+from .runners import ansible_runner, bash_runner, vagrant_runner
 from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path
 
 default_recipe_dirs = [
@@ -34,8 +34,15 @@ def parse_sys_args():
     return parser.parse_args()
 
 
-def provision(infra : str, provider : str, recipe : str):
-    pass
+def provision(infra_name : str, infra_provider : str, recipe_metadata : Dict[str, str], working_dir : str):
+    recipe_dir = recipe_metadata.get("recipe_dir")
+    if not recipe_dir: 
+        raise ValueError(f"Should not happen. recipe_dir does not exist in manifest: {recipe_metadata}")
+
+    recipe_runtime = recipe_metadata.get("recipe_runtime")
+    recipe_entry = recipe_metadata.get("recipe_entry", "bash")
+    if recipe_runtime == "vagrant":
+        vagrant_runner(infra_name, infra_provider, recipe_entry, recipe_dir, working_dir)
 
 def configure(infra_path : str, recipe_metadata : Dict[str, str]): 
     recipe_dir = recipe_metadata.get("recipe_dir")
@@ -71,7 +78,8 @@ def main():
         # Throw if the required provision_recipe is not available
         if args.recipe not in provision_recipes:
             raise ValueError(f"Provision recipe '{args.recipe}' does not exist.")
-        provision(args.infra, args.provider, args.recipe)
+        recipe_metadata = provision_recipes[args.recipe]
+        provision(args.infra, args.provider, recipe_metadata, working_dir)
     elif args.cmd == "configure":
         # Throw if the required configure recipe is not available
         if args.recipe not in configure_recipes:

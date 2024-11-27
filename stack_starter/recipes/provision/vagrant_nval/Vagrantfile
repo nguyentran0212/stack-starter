@@ -1,14 +1,15 @@
 # Vagrantfile for development cluster VM for NVAL
-
 ## Get paths to ssh keys from env
 # ENV_PATH = ENV['ENV_PATH'] || ".env"
 # SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
 SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || "~/.ssh/id_rsa.pub"
 WORKING_DIR = ENV['STACK_STARTER_WORKING_DIR'] || "/tmp/stack_starter/"
-PROVISION_ID = ENV['STACK_STARTER_PROVISION_ID'] || "tmp_provision_id"
+PROVISION_ID = ENV['STACK_STARTER_INFRA_NAME'] || "tmp_provision_id"
 
-# Dictionary to store info of hosts.
-host_info = {}
+
+# Import utility to write hostfile
+require 'fileutils'
+FileUtils.mkdir_p("#{WORKING_DIR}/#{PROVISION_ID}/")
 
 Vagrant.configure("2") do |config|
   # Configuration here will create default VMs
@@ -31,15 +32,17 @@ Vagrant.configure("2") do |config|
       vb.memory = "4096"
       vb.cpus = 4
     end
-    host_info["controller.local"] = {
-      "hostname" => "controller.local",
-      "hostaddr" => "192.168.56.12"
-    }
+    # Write down host info in inventory file
+    File.open("#{WORKING_DIR}/#{PROVISION_ID}/hosts.ini", "w") do |file|
+      file.puts "[controller]"
+      file.puts "controller.local ansible_host=192.168.56.12 ansible_user=vagrant"
+      file.puts "[workers]"
+    end # End File operation
   end # End controller provision
 
   ## Worker machines that NVAL uses to deploy blockchain
   (1..4).each do |i|
-    config.vm.define "nval_#{i}" do |nval|
+    config.vm.define "worker_#{i}" do |nval|
       nval.vm.box = "ubuntu/focal64"
       nval.vm.hostname = "nval#{i}.local"
       nval.vm.network "private_network", ip: "192.168.56.#{12 + i}", hostname: true
@@ -47,10 +50,11 @@ Vagrant.configure("2") do |config|
         vb.memory = "2048"
         vb.cpus = 1
       end
-      host_info["nval#{i}.local"] = {
-        "hostname" => "nval#{i}.local",
-        "hostaddr" => "192.168.56.#{12 + i}"
-      }
+
+      # Write down host info in inventory file
+      File.open("#{WORKING_DIR}/#{PROVISION_ID}/hosts.ini", "a") do |file|
+        file.puts "worker_#{i} ansible_host=192.168.56.#{12 + i} ansible_user=vagrant"
+      end # End File operation
     end
   end # End worker provision
 
@@ -65,19 +69,4 @@ Vagrant.configure("2") do |config|
     swapon /swapfile
     echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
   SHELL
-
-  require 'fileutils'
-
-  # Ensure the directory exists
-  FileUtils.mkdir_p("#{WORKING_DIR}/#{PROVISION_ID}")
-  File.open("#{WORKING_DIR}/#{PROVISION_ID}/hosts.ini", "w") do |file|
-    file.puts "[controller]"
-    file.puts "controller ansible_host=#{host_info["controller.local"]["hostaddr"]} ansible_user=vagrant"
-
-    file.puts "\n[worker]"
-    (1..4).each do |i|
-      file.puts "worker_#{i} ansible_host=#{host_info["nval#{i}.local"]["hostaddr"]} ansible_user=vagrant"
-    end
-  end # End File operation
-
 end # End vagrant configuration

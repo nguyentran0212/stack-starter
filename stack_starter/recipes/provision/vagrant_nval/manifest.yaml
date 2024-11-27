@@ -1,6 +1,7 @@
 ---
-name : "vagrant_nval"
+name : "sample_vagrant"
 version : "0.1.1"
+description: "A sample vagrant provision recipe"
 recipe_type : "provision"
 recipe_runtime : "vagrant" # Specify that bash is required to run this recipe
 recipe_entry : "Vagrantfile" # stack-starter would run bash start.sh 
