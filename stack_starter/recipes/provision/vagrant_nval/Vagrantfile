@@ -5,6 +5,7 @@
 # SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
 SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || "~/.ssh/id_rsa.pub"
 WORKING_DIR = ENV['STACK_STARTER_WORKING_DIR'] || "/tmp/stack_starter/"
+PROVISION_ID = ENV['STACK_STARTER_PROVISION_ID'] || "tmp_provision_id"
 
 # Dictionary to store info of hosts.
 host_info = {}
@@ -66,7 +67,7 @@ Vagrant.configure("2") do |config|
   SHELL
 
   # Write the host_info hash to an Ansible hosts file
-  File.open("#{WORKING_DIR}/hosts.ini", "w") do |file|
+  File.open("#{WORKING_DIR}/#{PROVISION_ID}/hosts.ini", "w") do |file|
     file.puts "[controller]"
     file.puts "controller ansible_host=#{host_info["controller.local"]["hostaddr"]} ansible_user=vagrant"
 
