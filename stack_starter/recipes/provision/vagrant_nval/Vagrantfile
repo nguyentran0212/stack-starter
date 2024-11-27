@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 4
     end
     host_info["controller.local"] = {
-      "hostname" => "controller.local"
+      "hostname" => "controller.local",
       "hostaddr" => "192.168.56.12"
     }
   end # End controller provision
