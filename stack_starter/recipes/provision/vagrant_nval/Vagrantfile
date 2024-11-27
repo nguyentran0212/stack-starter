@@ -1,7 +1,7 @@
 # Vagrantfile for development cluster VM for NVAL
 
 ## Get paths to ssh keys from env
-ENV_PATH = ".env"
+ENV_PATH = ENV['ENV_PATH'] || ".env"
 SSH_KEY_PATH = File.read(ENV_PATH).split("SSH_KEY_PATH=").last.strip
 
 # Dictionary to store info of hosts.
