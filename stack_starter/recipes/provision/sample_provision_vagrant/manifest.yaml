@@ -1,7 +1,7 @@
 ---
-name : "sample_vagrant"
+name : "sample_provision_vagrant"
 version : "0.1.1"
-description: "A sample vagrant provision recipe"
+description: "A sample vagrant provision recipe to create 1 cluster of 1 controller and 4 worker virtualbox VMs."
 recipe_type : "provision"
 recipe_runtime : "vagrant" # Specify that bash is required to run this recipe
 recipe_entry : "Vagrantfile" # stack-starter would run bash start.sh 

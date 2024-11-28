@@ -2,11 +2,11 @@ import argparse
 import os
 from typing_extensions import Dict
 from .runners import ansible_runner, bash_runner, vagrant_runner
-from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path
+from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path, pull_repo, print_recipe
 
 default_recipe_dirs = [
-    "./recipes",
-    "/tmp/stack_starter/recipes"
+    "/tmp/stack_starter/recipes",
+    "./recipes"
 ]
 
 # argparser custom action for parsing key-value arguments
@@ -23,13 +23,13 @@ class keyvalue(argparse.Action):
             getattr(namespace, self.dest)[key] = value 
 
 def parse_sys_args():
-    # Setup top level parser
+    # Setup top level parser `stack-starter`
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
     parser.add_argument("-d", "--directory", help="Working directory for storing provisioning output", default="/tmp/stack_starter/")
-    parser.add_argument("-r", "--recipe-path", help="Path to directory where recipies are stored", default="./../recipes")
+    parser.add_argument("-r", "--recipe-path", help="Path to directory where recipes are stored", default="/tmp/stack_starter/recipes")
     subparsers = parser.add_subparsers(title="CMD", description="Sub-commands", required=True)
 
-    # Setup sub-parser for provision sub-command
+    # Setup sub-parser `stack-starter provision ...`
     parser_provision = subparsers.add_parser("provision", description="Provision machines and networks from bare metal or cloud providers", epilog="Return an Ansible hostfile of the provisioned machines")
     parser_provision.add_argument("infra", help="Name of the infrastructure to provision or configure")
     parser_provision.add_argument("provider", help="Infrastructure provider for the machines to provision")
@@ -37,12 +37,24 @@ def parse_sys_args():
     parser_provision.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_provision.set_defaults(cmd="provision")
 
-    # Setup sub-parser for configure sub-command
+    # Setup sub-parser for `stack-starter configure ...`
     parser_configure = subparsers.add_parser("configure", description="Configure software stack on a specified infrastructure")
     parser_configure.add_argument("infra", help="Name of the infrastructure to configure. Use localhost to configure the current machine.", default="localhost")
     parser_configure.add_argument("recipe", help="Recipe for configure the infrastructure")
     parser_configure.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_configure.set_defaults(cmd="configure")
+
+    # Setup sub-parser for `stack-starter recipe ...`
+    parser_recipe = subparsers.add_parser("recipe", description="Manage recipes")
+    parser_recipe.set_defaults(cmd="recipe")
+    recipe_subparsers = parser_recipe.add_subparsers(title="Sub_CMD", description="Sub-commands for recipe management", required=True)
+    # Sub-parser for `stack-starter recipe pull ...`
+    parser_recipe_pull = recipe_subparsers.add_parser("pull", description="Pull recipe from a remote git repository")
+    parser_recipe_pull.add_argument("url", help="URL of the Git repository of the recipe")
+    parser_recipe_pull.set_defaults(recipe_cmd="pull")
+    # Sub-parser for `stack-starter recipe list ...`
+    parser_recipe_list = recipe_subparsers.add_parser("list", description="List the current recipes")
+    parser_recipe_list.set_defaults(recipe_cmd="list")
     
     # Parse and return arguments in Name space object
     # Example: Namespace(infra='home', directory='/tmp/stack_starter/', recipe='mac_os_host', cmd='configure')
@@ -58,6 +70,8 @@ def provision(infra_name : str, infra_provider : str, recipe_metadata : Dict[str
     recipe_entry = recipe_metadata.get("recipe_entry", "bash")
     if recipe_runtime == "vagrant":
         vagrant_runner(infra_name, infra_provider, recipe_entry, recipe_dir, working_dir, kwargs)
+    else:
+        raise ValueError(f"Unknown recipe requested: {recipe_runtime}")
 
 def configure(infra_path : str, recipe_metadata : Dict[str, str], kwargs : Dict[str, str]): 
     recipe_dir = recipe_metadata.get("recipe_dir")
@@ -71,8 +85,7 @@ def configure(infra_path : str, recipe_metadata : Dict[str, str], kwargs : Dict[
     elif recipe_runtime == "bash": 
         bash_runner(infra_path, recipe_entry, recipe_dir, kwargs)
     else:
-        raise ValueError(f"Unknown recipe runtime: {recipe_runtime}")
-
+        raise ValueError(f"Unknown recipe requested: {recipe_runtime}")
  
 
 def main():
@@ -102,11 +115,18 @@ def main():
         recipe_metadata = configure_recipes[args.recipe]
         infra_path = get_infra_path(args.infra, working_dir)
         configure(infra_path, recipe_metadata, args.kwargs) 
+    elif args.cmd == "recipe":
+        if args.recipe_cmd == "pull":
+            print(f"Pulling {args.url}...")
+            pull_repo(args.url, recipe_dirs[0]) # Hard code to clone into the first directory in the recipe directory
+        elif args.recipe_cmd == "list":
+            print("PROVISION RECIPES...")
+            for recipe in provision_recipes.values():
+               print_recipe(recipe) 
 
-    
-
-    # print("Welcome to Stack Starter!")
-    # Add your CLI logic here
+            print("\nCONFIGURE RECIPES...")
+            for recipe in configure_recipes.values():
+               print_recipe(recipe) 
 
 if __name__ == "__main__":
     main()
