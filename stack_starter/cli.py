@@ -2,11 +2,11 @@ import argparse
 import os
 from typing_extensions import Dict
 from .runners import ansible_runner, bash_runner, vagrant_runner
-from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path
+from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path, pull_repo, print_recipe
 
 default_recipe_dirs = [
-    "./recipes",
-    "/tmp/stack_starter/recipes"
+    "/tmp/stack_starter/recipes",
+    "./recipes"
 ]
 
 # argparser custom action for parsing key-value arguments
@@ -26,7 +26,7 @@ def parse_sys_args():
     # Setup top level parser `stack-starter`
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
     parser.add_argument("-d", "--directory", help="Working directory for storing provisioning output", default="/tmp/stack_starter/")
-    parser.add_argument("-r", "--recipe-path", help="Path to directory where recipies are stored", default="./../recipes")
+    parser.add_argument("-r", "--recipe-path", help="Path to directory where recipes are stored", default="/tmp/stack_starter/recipes")
     subparsers = parser.add_subparsers(title="CMD", description="Sub-commands", required=True)
 
     # Setup sub-parser `stack-starter provision ...`
@@ -70,6 +70,8 @@ def provision(infra_name : str, infra_provider : str, recipe_metadata : Dict[str
     recipe_entry = recipe_metadata.get("recipe_entry", "bash")
     if recipe_runtime == "vagrant":
         vagrant_runner(infra_name, infra_provider, recipe_entry, recipe_dir, working_dir, kwargs)
+    else:
+        raise ValueError(f"Unknown recipe requested: {recipe_runtime}")
 
 def configure(infra_path : str, recipe_metadata : Dict[str, str], kwargs : Dict[str, str]): 
     recipe_dir = recipe_metadata.get("recipe_dir")
@@ -83,8 +85,7 @@ def configure(infra_path : str, recipe_metadata : Dict[str, str], kwargs : Dict[
     elif recipe_runtime == "bash": 
         bash_runner(infra_path, recipe_entry, recipe_dir, kwargs)
     else:
-        raise ValueError(f"Unknown recipe runtime: {recipe_runtime}")
-
+        raise ValueError(f"Unknown recipe requested: {recipe_runtime}")
  
 
 def main():
@@ -117,8 +118,15 @@ def main():
     elif args.cmd == "recipe":
         if args.recipe_cmd == "pull":
             print(f"Pulling {args.url}...")
+            pull_repo(args.url, recipe_dirs[0]) # Hard code to clone into the first directory in the recipe directory
         elif args.recipe_cmd == "list":
-            print("Listing recipes...")
+            print("PROVISION RECIPES...")
+            for recipe in provision_recipes.values():
+               print_recipe(recipe) 
+
+            print("\nCONFIGURE RECIPES...")
+            for recipe in configure_recipes.values():
+               print_recipe(recipe) 
 
 if __name__ == "__main__":
     main()

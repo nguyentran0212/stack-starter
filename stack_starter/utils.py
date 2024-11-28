@@ -1,5 +1,6 @@
 import os
 import yaml
+import subprocess
 from typing import List, Tuple
 from typing_extensions import Dict
 
@@ -102,8 +103,29 @@ def get_infra_path(infra_name: str, working_dir: str) -> str:
 
     return infra_path
 
+def pull_repo(url : str, recipe_dir : str, force = False): 
+    os.chdir(recipe_dir)
+    command = [
+        "git",
+        "clone",
+        "--depth=1",
+        url
+    ]
+    subprocess.run(command, check=True)
+
+def print_recipe(recipe_metadata : dict[str, str]):
+    print("=============")
+    print(f"Recipe: {recipe_metadata.get("name")}")
+    print(f" |--Version: {recipe_metadata.get("version", "N/A")}")
+    print(f" |--Homepage: {recipe_metadata.get("homepage", "N/A")}")
+    print(f" |--Repo URL: {recipe_metadata.get("repository_url", "N/A")}")
+    print(f" |--Directory: {recipe_metadata.get("recipe_dir")}")
+    print(f" |--Runtime: {recipe_metadata.get("recipe_runtime")}")
+    print(f" |--Entry: {recipe_metadata.get("recipe_entry")}")
+
 def set_provision_env_variables(infra_name : str, infra_provider : str, working_dir : str):
     os.environ['STACK_STARTER_INFRA_NAME'] = infra_name
     os.environ['STACK_STARTER_INFRA_PROVIDER'] = infra_provider
     os.environ["STACK_STARTER_WORKING_DIR"] = working_dir
+
 

@@ -1,8 +1,8 @@
 ---
-name : "sample_provision"
+name : "sample_provision_bash"
 version : "0.1.1"
 homepage : "https://home-page.org"
 repository_url : "git://github.com/my/repo"
 recipe_type : "provision"
-recipe_runtime : "vagrant" # Specify that bash is required to run this recipe
-recipe_entry : "Vagrantfile" # stack-starter would run bash start.sh 
+recipe_runtime : "bash" # Specify that bash is required to run this recipe
+recipe_entry : "start.sh" # stack-starter would run bash start.sh 
