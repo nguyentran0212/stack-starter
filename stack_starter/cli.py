@@ -23,13 +23,13 @@ class keyvalue(argparse.Action):
             getattr(namespace, self.dest)[key] = value 
 
 def parse_sys_args():
-    # Setup top level parser
+    # Setup top level parser `stack-starter`
     parser = argparse.ArgumentParser(description="A utility for provision machines and configure software stacks based on predefined recipes")
     parser.add_argument("-d", "--directory", help="Working directory for storing provisioning output", default="/tmp/stack_starter/")
     parser.add_argument("-r", "--recipe-path", help="Path to directory where recipies are stored", default="./../recipes")
     subparsers = parser.add_subparsers(title="CMD", description="Sub-commands", required=True)
 
-    # Setup sub-parser for provision sub-command
+    # Setup sub-parser `stack-starter provision ...`
     parser_provision = subparsers.add_parser("provision", description="Provision machines and networks from bare metal or cloud providers", epilog="Return an Ansible hostfile of the provisioned machines")
     parser_provision.add_argument("infra", help="Name of the infrastructure to provision or configure")
     parser_provision.add_argument("provider", help="Infrastructure provider for the machines to provision")
@@ -37,15 +37,24 @@ def parse_sys_args():
     parser_provision.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_provision.set_defaults(cmd="provision")
 
-    # Setup sub-parser for configure sub-command
+    # Setup sub-parser for `stack-starter configure ...`
     parser_configure = subparsers.add_parser("configure", description="Configure software stack on a specified infrastructure")
     parser_configure.add_argument("infra", help="Name of the infrastructure to configure. Use localhost to configure the current machine.", default="localhost")
     parser_configure.add_argument("recipe", help="Recipe for configure the infrastructure")
     parser_configure.add_argument('--kwargs', nargs="*", action = keyvalue, help="List of key-value arguments to pass to the provision recipe. Use key=value syntax.")
     parser_configure.set_defaults(cmd="configure")
 
-    # Setup sub-parser for recipe management sub-command
+    # Setup sub-parser for `stack-starter recipe ...`
     parser_recipe = subparsers.add_parser("recipe", description="Manage recipes")
+    parser_recipe.set_defaults(cmd="recipe")
+    recipe_subparsers = parser_recipe.add_subparsers(title="Sub_CMD", description="Sub-commands for recipe management", required=True)
+    # Sub-parser for `stack-starter recipe pull ...`
+    parser_recipe_pull = recipe_subparsers.add_parser("pull", description="Pull recipe from a remote git repository")
+    parser_recipe_pull.add_argument("url", help="URL of the Git repository of the recipe")
+    parser_recipe_pull.set_defaults(recipe_cmd="pull")
+    # Sub-parser for `stack-starter recipe list ...`
+    parser_recipe_list = recipe_subparsers.add_parser("list", description="List the current recipes")
+    parser_recipe_list.set_defaults(recipe_cmd="list")
     
     # Parse and return arguments in Name space object
     # Example: Namespace(infra='home', directory='/tmp/stack_starter/', recipe='mac_os_host', cmd='configure')
@@ -105,11 +114,11 @@ def main():
         recipe_metadata = configure_recipes[args.recipe]
         infra_path = get_infra_path(args.infra, working_dir)
         configure(infra_path, recipe_metadata, args.kwargs) 
-
-    
-
-    # print("Welcome to Stack Starter!")
-    # Add your CLI logic here
+    elif args.cmd == "recipe":
+        if args.recipe_cmd == "pull":
+            print(f"Pulling {args.url}...")
+        elif args.recipe_cmd == "list":
+            print("Listing recipes...")
 
 if __name__ == "__main__":
     main()
