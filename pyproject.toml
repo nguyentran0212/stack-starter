@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stack-starter"
-version = "0.1.0"
+version = "0.2.0"
 description = "A CLI tool for starting software stacks"
 authors = ["Nguyen Khoi Tran <nguyen.tran@adelaide.edu.au>"]
 license = "GPL-3.0-only"

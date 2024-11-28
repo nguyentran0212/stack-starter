@@ -3,4 +3,4 @@
   hosts: all
   tasks:
     - name: Execute setup_mac.sh
-      shell: ./setup_mac.sh
+      shell: ./start.sh

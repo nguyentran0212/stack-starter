@@ -15,9 +15,9 @@ Think of `stack-starter` as a USB stick for setting up a new OS, but instead of 
 
 ## Installation
 
-We use `pipx` to make the `stack-starter` utility available in terminal without modifying the python packages at the system level.
+We use `pipx` to make the `stack-starter` utility available in terminal without modifying the python packages at the system level. Use the following instructions for installing and updating.
 
-### macOS
+### macOS and GNU/Linux systems
 
 
 1. Install `pipx` if you haven't already:
@@ -33,16 +33,13 @@ We use `pipx` to make the `stack-starter` utility available in terminal without 
     pipx install ansible
     ```
 
-3. Install `stack-starter`:
+3. Clone and install `stack-starter`:
 
     ```bash
-    pipx install stack-starter
+    git clone git@github.com:nguyentran0212/stack-starter.git
+    cd stack-starter
+    pipx install --force ./
     ```
-
-### GNU/Linux based systems
-
-TBA
-
 
 ## Usage
 
@@ -55,22 +52,34 @@ stack-starter configure localhost recipe_name
 
 # Use a recipe to configure infrastructure in an ansible hostfile called infra_name
 stack-starter configure infra_name recipe_name
+
+# List all known recipes
+stack-starter recipe list
+
+# Pull recipes from remote Git repository
+stack-starter recipe pull <git URL>
+
+# Create a starter recipe project to develop your own recipe
+# Available starter recipes: configure-bash, configure-ansible, provision-vagrant
+stack-starter recipe create <starter-recipe> <recipe directory>
 ```
 
 
 ## Available recipes
 
-Built-in recipes are stored in `stack_starter/recipes/configure` and `stack_starter/recipes/provision`
+Built-in example recipes are stored in `stack_starter/recipes/configure` and `stack_starter/recipes/provision`
 
 ### Provision
 
-Provision recipes handle the creation
+Provision recipes handle the creation of VMs and networks
 
 - TBA
 
 ### Configure
 
-- `mac_arm_starter`: macOS rice with `ZSH`, `nvim`, `kitty` terminal emulator, tiling manager `yabai`, hotkey daemon `skhd`, `sketchybar` and `borders`. Tested on macOS 14. 
+Configure recipes handle the setup of software stack on VMs
+
+- TBA
 
 
 ## Contribute
@@ -91,3 +100,4 @@ Built-in recipes are stored in the `stack-starter/recipes` folder by default. Us
 
 Each recipe is a folder which contains a `manifest.json` file. Information inside manifest is used to identify and run recipe.[Manifest instruction](docs/recipe_manifest/manifest_specs.md). 
 
+Use `stack-starter recipe create` command to create template recipe to start the development.

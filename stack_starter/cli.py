@@ -2,7 +2,7 @@ import argparse
 import os
 from typing_extensions import Dict
 from .runners import ansible_runner, bash_runner, vagrant_runner
-from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path, pull_repo, print_recipe
+from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path, pull_repo, print_recipe, create_starter_recipe
 
 default_recipe_dirs = [
     "/tmp/stack_starter/recipes",
@@ -55,6 +55,11 @@ def parse_sys_args():
     # Sub-parser for `stack-starter recipe list ...`
     parser_recipe_list = recipe_subparsers.add_parser("list", description="List the current recipes")
     parser_recipe_list.set_defaults(recipe_cmd="list")
+    # Sub-parser for `stack-starter recipe create ...`
+    parser_recipe_create = recipe_subparsers.add_parser("create", description="Create an starter recipe")
+    parser_recipe_create.add_argument("recipe", help="Name of the sample recipe to create")
+    parser_recipe_create.add_argument("dir", help="Directory to create the starter recipe")
+    parser_recipe_create.set_defaults(recipe_cmd="create")
     
     # Parse and return arguments in Name space object
     # Example: Namespace(infra='home', directory='/tmp/stack_starter/', recipe='mac_os_host', cmd='configure')
@@ -127,6 +132,10 @@ def main():
             print("\nCONFIGURE RECIPES...")
             for recipe in configure_recipes.values():
                print_recipe(recipe) 
+        elif args.recipe_cmd == "create":
+            create_starter_recipe(args.recipe, args.dir)
+            print(f"Starter recipe created at {args.dir}")
+
 
 if __name__ == "__main__":
     main()

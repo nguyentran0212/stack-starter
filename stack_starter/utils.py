@@ -113,6 +113,28 @@ def pull_repo(url : str, recipe_dir : str, force = False):
     ]
     subprocess.run(command, check=True)
 
+def create_starter_recipe(recipe : str, dir : str):
+    starter_recipes = {
+        "configure-bash" : "./recipes/configure/sample_configure_bash/",
+        "configure-ansible" : "./recipes/configure/sample_configure_ansible/",
+        "provision-vagrant" : "./recipes/provision/sample_provision_vagrant/"
+    }
+    
+    if recipe not in starter_recipes:
+        raise ValueError(f"Unknown starter recipe requested. Available recipes: {starter_recipes.keys()}")
+
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.makedirs(dir, exist_ok=True)
+
+    command = [
+        "cp",
+        "-r", 
+        os.path.join(script_dir, str(starter_recipes.get(recipe))),
+        dir
+    ]
+    subprocess.run(command, check=True)
+
 def print_recipe(recipe_metadata : dict[str, str]):
     print("=============")
     print(f"Recipe: {recipe_metadata.get("name")}")

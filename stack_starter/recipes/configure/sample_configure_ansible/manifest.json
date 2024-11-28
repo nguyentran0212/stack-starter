@@ -1,5 +1,0 @@
-{
-  "configuration_tool" : "ansible",
-  "playbook" : "playbook.yml",
-  "ask_become_pass" : false
-}
