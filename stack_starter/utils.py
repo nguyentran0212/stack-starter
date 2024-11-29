@@ -17,13 +17,12 @@ def prepare_dir_list(dir: str, default_dirs: List[str] = []) -> List[str]:
     """
     valid_dirs = []
     combined_dirs = [dir] + default_dirs
-    script_dir = os.path.dirname(os.path.abspath(__file__))
 
     for dir in combined_dirs:
         if os.path.isabs(dir):
             valid_dirs.append(dir)
         else:
-            valid_dirs.append(os.path.abspath(os.path.join(script_dir, dir)))
+            valid_dirs.append(os.path.abspath(os.path.join(os.getcwd(), dir)))
 
     return valid_dirs
 
