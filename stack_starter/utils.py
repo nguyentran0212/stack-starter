@@ -72,10 +72,11 @@ def prepare_working_dir(working_dir: str):
         working_dir (str): The path to the working directory.
     """
     # Create directory structure
-    os.makedirs("recipes")
+    os.makedirs(working_dir, exist_ok=True)
+    os.makedirs(os.path.join(working_dir, "recipes"), exist_ok=True)
 
     # Create empty localhost file if it does not exist
-    os.makedirs("localhost")
+    os.makedirs(os.path.join(working_dir, "localhost"), exist_ok=True)
     with open(os.path.join(working_dir, "localhost", "hosts.ini"), 'w') as inventory_file:
         inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
 
