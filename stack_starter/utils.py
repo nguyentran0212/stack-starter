@@ -137,13 +137,13 @@ def create_starter_recipe(recipe : str, dir : str):
 
 def print_recipe(recipe_metadata : dict[str, str]):
     print("=============")
-    print(f"Recipe: {recipe_metadata.get("name")}")
-    print(f" |--Version: {recipe_metadata.get("version", "N/A")}")
-    print(f" |--Homepage: {recipe_metadata.get("homepage", "N/A")}")
-    print(f" |--Repo URL: {recipe_metadata.get("repository_url", "N/A")}")
-    print(f" |--Directory: {recipe_metadata.get("recipe_dir")}")
-    print(f" |--Runtime: {recipe_metadata.get("recipe_runtime")}")
-    print(f" |--Entry: {recipe_metadata.get("recipe_entry")}")
+    print(f'Recipe: {recipe_metadata.get("name")}')
+    print(f' |--Version: {recipe_metadata.get("version", "N/A")}')
+    print(f' |--Homepage: {recipe_metadata.get("homepage", "N/A")}')
+    print(f' |--Repo URL: {recipe_metadata.get("repository_url", "N/A")}')
+    print(f' |--Directory: {recipe_metadata.get("recipe_dir")}')
+    print(f' |--Runtime: {recipe_metadata.get("recipe_runtime")}')
+    print(f' |--Entry: {recipe_metadata.get("recipe_entry")}')
 
 def set_provision_env_variables(infra_name : str, infra_provider : str, working_dir : str):
     os.environ['STACK_STARTER_INFRA_NAME'] = infra_name
