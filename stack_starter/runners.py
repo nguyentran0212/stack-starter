@@ -2,12 +2,12 @@ import os
 import subprocess
 from .utils import set_provision_env_variables
 
-def ansible_runner(infra_path : str, playbook : str, recipe_dir : str, kwargs : dict[str, str]):
+def ansible_runner(infra_path : str, playbook : str, recipe_dir : str, kwargs : dict[str, str], inventory_file = "hosts.ini"):
     os.chdir(str(recipe_dir)) 
     ansible_command = [
         "ansible-playbook",
         playbook,
-        "-i", infra_path,
+        "-i", os.path.join(infra_path, inventory_file), # Assume that inventory_file is hosts.ini underneath the infra_path
         "-vv",
         # "--ask-become-pass"
     ]
