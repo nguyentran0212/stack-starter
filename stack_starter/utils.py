@@ -72,8 +72,12 @@ def prepare_working_dir(working_dir: str):
         working_dir (str): The path to the working directory.
     """
     # Create directory structure
+    os.makedirs("recipes")
+
     # Create empty localhost file if it does not exist
-    pass
+    os.makedirs("localhost")
+    with open(os.path.join(working_dir, "localhost", "hosts.ini"), 'w') as inventory_file:
+        inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
 
 
 def get_infra_path(infra_name: str, working_dir: str) -> str:
@@ -92,10 +96,10 @@ def get_infra_path(infra_name: str, working_dir: str) -> str:
     """
     infra_path = os.path.join(working_dir, infra_name)
 
-    if infra_name == "localhost":
-        os.makedirs(os.path.dirname(infra_path), exist_ok=True)
-        with open(infra_path, 'w') as inventory_file:
-            inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
+    # if infra_name == "localhost":
+    #     os.makedirs(os.path.dirname(infra_path), exist_ok=True)
+    #     with open(infra_path, 'w') as inventory_file:
+    #         inventory_file.write("[local]\nlocalhost ansible_connection=local\n")
 
     if not os.path.exists(infra_path): 
         raise NotADirectoryError(f"Cannot find an inventory file at {infra_path}. Please provision the infrastructure first.")

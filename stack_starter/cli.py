@@ -99,8 +99,7 @@ def main():
     # Parse system args
     args = parse_sys_args()
     # Setup paths, prepare working directory, and load recipes
-    script_dir = os.path.dirname(os.path.abspath(__file__))    
-    working_dir = os.path.abspath(args.directory) if os.path.isabs(args.directory) else os.path.join(script_dir, args.directory)
+    working_dir = os.path.abspath(args.directory) if os.path.isabs(args.directory) else os.path.join(os.getcwd(), args.directory)
     recipe_dirs = prepare_dir_list(args.recipe_path, default_recipe_dirs)
 
     # Prepare working directory
