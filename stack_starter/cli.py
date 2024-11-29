@@ -4,9 +4,11 @@ from typing_extensions import Dict
 from .runners import ansible_runner, bash_runner, vagrant_runner
 from .utils import load_recipes, prepare_dir_list, prepare_working_dir, get_infra_path, pull_repo, print_recipe, create_starter_recipe
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 default_recipe_dirs = [
-    "/tmp/stack_starter/recipes",
-    "./recipes"
+    "/tmp/stack_starter/recipes", # Default tmp folder for storing recipes
+    os.path.join(script_dir, "./recipes") # Starter / example recipes shipped with stack-starter
 ]
 
 # argparser custom action for parsing key-value arguments
