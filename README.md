@@ -43,22 +43,36 @@ We use `pipx` to make the `stack-starter` utility available in terminal without 
 
 ## Usage
 
+Use the `provision` sub-command to use a provision recipe to create an infrastructure. The information of the resulting infrastructure is written in an Ansible host file.
+
 ```bash
 # Use a recipe to provision an infrastructure and store the info in an Ansible hostfile named infra_name
 stack-starter provision infra_name recipe_name
+```
 
-# Use a recipe to configure localhost
-stack-starter configure localhost recipe_name
+Use the `configure` sub-command to use a configuration recipe to configure an infrastructure. The infrastructure is given by an Ansible host file. Alternatively, you can use `localhost` to direct `stack-starter` to apply a provision recipe to localhost.
 
+```bash
 # Use a recipe to configure infrastructure in an ansible hostfile called infra_name
 stack-starter configure infra_name recipe_name
 
+# Use a recipe to configure localhost
+stack-starter configure localhost recipe_name
+```
+
+Use the `recipe` sub-command to manage the list of available recipes. When you pull recipes, by default, they would be stored at `/tmp/`. There is a known bug that the tool would fail if you try to pull an existing recipe. The current workaround is to delete the recipe in `/tmp/` before pulling the updated version. 
+
+```bash
 # List all known recipes
 stack-starter recipe list
 
 # Pull recipes from remote Git repository
 stack-starter recipe pull <git URL>
+```
 
+Use the `recipe create` sub-command to create a template repository to start developing your recipe.
+
+```bash
 # Create a starter recipe project to develop your own recipe
 # Available starter recipes: configure-bash, configure-ansible, provision-vagrant
 stack-starter recipe create <starter-recipe> <recipe directory>
